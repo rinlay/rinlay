@@ -17,7 +17,7 @@ export namespace JSX {
   export interface ElementChildrenAttribute {
     children: {}
   }
-  // mini-react accepts arbitrary DOM tags/props at runtime
+  // rinlay-react accepts arbitrary DOM tags/props at runtime
   export interface IntrinsicElements {
     [elemName: string]: Props
   }

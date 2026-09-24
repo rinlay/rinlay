@@ -10,7 +10,7 @@ let nextId = 1
 
 export default function App() {
   const [todos, setTodos] = useState<Todo[]>([
-    { id: nextId++, text: '写一个 mini-react', done: true },
+    { id: nextId++, text: '写一个 rinlay-react', done: true },
     { id: nextId++, text: '做一个 todo list', done: false },
   ])
 

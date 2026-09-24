@@ -12,5 +12,5 @@
     "lib": ["ESNext", "DOM"]
   },
   "include": ["src/**/*"],
-  "references": [{ "path": "./packages/mini-react" }]
+  "references": [{ "path": "./packages/rinlay-react"}]
 }

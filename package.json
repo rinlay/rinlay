@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node server.js",
     "start": "serve .rinlay",
-    "build": "tsc -b && mkdir -p .rinlay/react && cp packages/mini-react/dist/*.js packages/mini-react/dist/*.js.map .rinlay/react/ && cp src/index.css .rinlay/index.css && cp static/index.html .rinlay/index.html"
+    "build": "tsc -b && mkdir -p .rinlay/react && cp packages/rinlay-react/dist/*.js packages/rinlay-react/dist/*.js.map .rinlay/react/ && cp src/index.css .rinlay/index.css && cp static/index.html .rinlay/index.html"
   },
   "dependencies": {
     "react": "workspace:*"
