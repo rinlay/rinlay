@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node server.js",
-    "start": "node server.js",
+    "start": "serve dist",
     "build": "node build.js"
   },
   "dependencies": {
@@ -14,6 +14,7 @@
   "devDependencies": {
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "serve": "^14.2.6",
     "typescript": "^7.0.2"
   }
 }
