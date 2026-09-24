@@ -30,9 +30,14 @@
     }
   },
   "scripts": {
-    "build": "tsc -b"
+    "build": "tsc -b",
+    "test": "vitest run"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "happy-dom": "^20.14.5",
+    "vitest": "^5.0.1"
   }
 }

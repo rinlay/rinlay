@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: "rinlay — 拒绝黑盒",
   description:
     "自研 React 运行时。产物是一份 JavaScript 和一份 CSS。挂一个插槽，就能进任何系统。",
+  icons: { icon: "/icon.png" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
