@@ -156,12 +156,14 @@ function emitPathForJsUrl(absJsPath) {
 function startTscWatch() {
   const require = createRequire(import.meta.url)
   const tsc = path.join(path.dirname(require.resolve('typescript/package.json')), 'bin', 'tsc')
-  const child = spawn(process.execPath, [tsc, '-w', '--pretty', 'false'], {
+  const child = spawn(process.execPath, [tsc, '-w', '--pretty', 'false', '--preserveWatchOutput'], {
     cwd: ROOT,
     stdio: ['ignore', 'pipe', 'pipe'],
   })
   const log = (buf) => {
-    const text = buf.toString().trim()
+    const text = buf.toString()
+      .replace(/\x1b\[2J|\x1b\[3J|\x1b\[H|\x1bc/g, '')
+      .trim()
     if (text) console.log(`[tsc] ${text}`)
   }
   child.stdout.on('data', log)
