@@ -4,6 +4,9 @@ export type Props = Record<string, unknown> & {
 
 export type Child = VNode | string | number | boolean | null | undefined
 
+/** React-compatible alias for what components can render / accept as children. */
+export type ReactNode = Child | Child[]
+
 export type VNode = {
   type: string | FunctionComponent | typeof Fragment
   props: Props
