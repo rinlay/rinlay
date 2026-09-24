@@ -1,9 +1,7 @@
 import fsp from 'node:fs/promises'
 import path from 'node:path'
-import { spawnSync } from 'node:child_process'
 import {
   loadTsconfig,
-  resolveTsc,
   resolveReactDir,
   rewriteHtmlForBuild,
   copyDirJs,
@@ -11,8 +9,9 @@ import {
 } from './shared.js'
 
 /**
- * tsc → copy index.html (rewritten) + css + react into outDir
+ * Copy index.html (rewritten) + css + react into outDir
  * so `.rinlay/` (or tsconfig outDir) is a static site.
+ * Does not run tsc — emit is assumed to already be in outDir.
  */
 export async function build({ root }) {
   const indexHtml = path.join(root, 'index.html')
@@ -24,13 +23,6 @@ export async function build({ root }) {
   }
 
   const { outDir, rootDir } = await loadTsconfig(root)
-  const tsc = resolveTsc(root)
-
-  const result = spawnSync(process.execPath, [tsc, '-b', '--pretty', 'false'], {
-    cwd: root,
-    stdio: 'inherit',
-  })
-  if (result.status !== 0) process.exit(result.status ?? 1)
 
   // react runtime → outDir/react/
   const reactDir = resolveReactDir(root)
