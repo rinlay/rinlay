@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       react:
-        specifier: workspace:*
+        specifier: workspace:rinlay-react@*
         version: link:packages/rinlay-react
     devDependencies:
       '@types/react':

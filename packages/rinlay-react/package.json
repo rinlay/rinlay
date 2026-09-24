@@ -1,8 +1,12 @@
 {
-  "name": "react",
-  "version": "0.0.0",
-  "private": true,
+  "name": "rinlay-react",
+  "version": "0.1.0",
+  "description": "A minimal React-like runtime for rinlay",
   "type": "module",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -16,5 +20,9 @@
       "types": "./dist/jsx-dev-runtime.d.ts",
       "default": "./dist/jsx-dev-runtime.js"
     }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "prepublishOnly": "tsc -b"
   }
 }
