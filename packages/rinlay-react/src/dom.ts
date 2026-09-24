@@ -1,14 +1,38 @@
 import { Fragment, type Child, type FunctionComponent, type Props, type VNode } from './jsx-runtime.js'
 
 type Setter<T> = (value: T | ((prev: T) => T)) => void
+type EffectCleanup = void | (() => void)
+type EffectFn = () => EffectCleanup
+
+type EffectSlot = {
+  deps: unknown[] | undefined
+  effect: EffectFn
+  cleanup: EffectCleanup
+}
 
 type HookState = {
   values: unknown[]
   index: number
+  pendingEffects: number[]
   rerender: () => void
 }
 
 let currentHook: HookState | null = null
+
+function depsEqual(a: unknown[] | undefined, b: unknown[] | undefined): boolean {
+  if (a === undefined || b === undefined) return false
+  if (a.length !== b.length) return false
+  return a.every((v, i) => Object.is(v, b[i]))
+}
+
+function flushEffects(hook: HookState) {
+  for (const i of hook.pendingEffects) {
+    const slot = hook.values[i] as EffectSlot
+    if (typeof slot.cleanup === 'function') slot.cleanup()
+    slot.cleanup = slot.effect()
+  }
+  hook.pendingEffects = []
+}
 
 export function useState<T>(initial: T | (() => T)): [T, Setter<T>] {
   if (!currentHook) {
@@ -27,6 +51,27 @@ export function useState<T>(initial: T | (() => T)): [T, Setter<T>] {
     hook.rerender()
   }
   return [hook.values[i] as T, setState]
+}
+
+export function useEffect(effect: EffectFn, deps?: unknown[]): void {
+  if (!currentHook) {
+    throw new Error('useEffect must be called inside a component')
+  }
+  const hook = currentHook
+  const i = hook.index++
+  const prev = hook.values[i] as EffectSlot | undefined
+
+  if (!prev) {
+    hook.values[i] = { deps, effect, cleanup: undefined } satisfies EffectSlot
+    hook.pendingEffects.push(i)
+    return
+  }
+
+  if (!depsEqual(prev.deps, deps)) {
+    prev.deps = deps
+    prev.effect = effect
+    hook.pendingEffects.push(i)
+  }
 }
 
 function flatten(children: Child | Child[] | undefined): Child[] {
@@ -100,6 +145,7 @@ function mountComponent(type: FunctionComponent, props: Props): Node {
   const hook: HookState = {
     values: [],
     index: 0,
+    pendingEffects: [],
     rerender: () => {},
   }
 
@@ -108,6 +154,7 @@ function mountComponent(type: FunctionComponent, props: Props): Node {
 
   const render = () => {
     hook.index = 0
+    hook.pendingEffects = []
     currentHook = hook
     let tree: Child
     try {
@@ -118,6 +165,8 @@ function mountComponent(type: FunctionComponent, props: Props): Node {
     const next = createDom(tree)
     current.parentNode?.replaceChild(next, current)
     current = next
+    // after commit (and after parent append on first mount)
+    queueMicrotask(() => flushEffects(hook))
   }
 
   hook.rerender = render
