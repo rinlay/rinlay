@@ -1,20 +1,17 @@
 {
-  "name": "rinlay",
-  "version": "1.0.0",
+  "name": "rinlay-playground",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node server.js",
-    "start": "serve .rinlay",
-    "build": "tsc -b && mkdir -p .rinlay/react && cp packages/rinlay-react/dist/*.js packages/rinlay-react/dist/*.js.map .rinlay/react/ && cp src/index.css .rinlay/index.css && cp static/index.html .rinlay/index.html"
+    "dev": "rinlay",
+    "start": "rinlay"
   },
   "dependencies": {
     "react": "workspace:rinlay-react@*"
   },
   "devDependencies": {
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "serve": "^14.2.6",
+    "rinlay": "workspace:*",
     "typescript": "^7.0.2"
   }
 }

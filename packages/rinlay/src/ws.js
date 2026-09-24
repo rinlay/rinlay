@@ -128,7 +128,6 @@ class WebSocketClient {
         return
       }
       if (opcode === 0x9) {
-        // ping → pong
         const pong = Buffer.alloc(2 + payload.length)
         pong[0] = 0x8a
         pong[1] = payload.length
