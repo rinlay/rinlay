@@ -7,7 +7,7 @@ import { createRequire } from 'node:module'
 import { WebSocketServer } from './ws.js'
 import { loadTsconfig, resolveTsc } from './shared.js'
 
-const MIME = {
+const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -79,13 +79,13 @@ const HMR_CLIENT = /* html */ `
 </script>
 `
 
-function toPublicPath(root, absPath) {
+function toPublicPath(root: string, absPath: string) {
   return '/' + path.relative(root, absPath).split(path.sep).join('/')
 }
 
-function buildImportMap(root) {
+function buildImportMap(root: string) {
   const require = createRequire(path.join(root, 'package.json'))
-  const imports = {}
+  const imports: Record<string, string> = {}
   let reactFile = ''
   for (const spec of ['react', 'react/jsx-runtime', 'react/jsx-dev-runtime']) {
     try {
@@ -105,7 +105,7 @@ function buildImportMap(root) {
   return `<script type="importmap">\n${JSON.stringify({ imports }, null, 2)}\n</script>`
 }
 
-function injectHtml(html, importMap) {
+function injectHtml(html: string, importMap: string) {
   let out = html
   if (importMap && !out.includes('type="importmap"')) {
     if (/<\/head>/i.test(out)) {
@@ -124,21 +124,21 @@ function injectHtml(html, importMap) {
   return out
 }
 
-function startTscWatch(root) {
+function startTscWatch(root: string) {
   const tsc = resolveTsc(root)
   const child = spawn(process.execPath, [tsc, '-b', '-w', '--pretty', 'false', '--preserveWatchOutput'], {
     cwd: root,
     stdio: ['ignore', 'pipe', 'pipe'],
   })
-  const log = (buf) => {
+  const log = (buf: Buffer) => {
     const text = buf
       .toString()
       .replace(/\x1b\[2J|\x1b\[3J|\x1b\[H|\x1bc/g, '')
       .trim()
     if (text) console.log(`[tsc] ${text}`)
   }
-  child.stdout.on('data', log)
-  child.stderr.on('data', log)
+  child.stdout?.on('data', log)
+  child.stderr?.on('data', log)
   child.on('exit', (code) => {
     if (code != null && code !== 0) console.error(`[tsc] exited with ${code}`)
   })
@@ -161,7 +161,7 @@ function startTscWatch(root) {
   return child
 }
 
-async function waitForFile(filePath, ms = 5000) {
+async function waitForFile(filePath: string, ms = 5000) {
   const start = Date.now()
   while (Date.now() - start < ms) {
     try {
@@ -178,7 +178,7 @@ async function waitForFile(filePath, ms = 5000) {
  * Vite-like dev: user only needs index.html.
  * rinlay runs tsc -w and serves the project; .ts/.tsx map to tsc emit.
  */
-export async function startDev({ root, port, host }) {
+export async function startDev({ root, port, host }: { root: string; port: number; host: string }) {
   const indexHtml = path.join(root, 'index.html')
   try {
     await fsp.access(indexHtml)
@@ -192,7 +192,7 @@ export async function startDev({ root, port, host }) {
   const outDirName = path.basename(outDir)
   const ignoreDirs = new Set([...IGNORE_DIRS, outDirName])
 
-  function safeResolve(urlPath) {
+  function safeResolve(urlPath: string) {
     const decoded = decodeURIComponent(urlPath.split('?')[0])
     const rel = decoded === '/' ? '/index.html' : decoded
     const resolved = path.normalize(path.join(root, rel))
@@ -200,13 +200,13 @@ export async function startDev({ root, port, host }) {
     return resolved
   }
 
-  function emitPathFor(absSource) {
+  function emitPathFor(absSource: string) {
     const rel = path.relative(rootDir, absSource)
     if (rel.startsWith('..')) return null
     return path.join(outDir, rel.replace(/\.tsx?$/, '.js'))
   }
 
-  function emitPathForJsUrl(absJsPath) {
+  function emitPathForJsUrl(absJsPath: string) {
     const rel = path.relative(rootDir, absJsPath)
     if (rel.startsWith('..') || path.extname(rel) !== '.js') return null
     return path.join(outDir, rel)
@@ -291,14 +291,14 @@ export async function startDev({ root, port, host }) {
 
   const wss = new WebSocketServer(server)
 
-  function broadcast(payload) {
+  function broadcast(payload: { type: string; path: string }) {
     const data = JSON.stringify(payload)
     for (const client of wss.clients) {
       if (client.readyState === 1) client.send(data)
     }
   }
 
-  function shouldIgnore(absPath) {
+  function shouldIgnore(absPath: string) {
     const rel = path.relative(root, absPath)
     if (rel.startsWith('..')) return true
     // ignore tsc emit dir (whatever outDir is)
@@ -307,14 +307,15 @@ export async function startDev({ root, port, host }) {
     return parts.some((p) => ignoreDirs.has(p) || p.startsWith('.'))
   }
 
-  const debounce = new Map()
+  const debounce = new Map<string, ReturnType<typeof setTimeout>>()
 
-  function onChange(absPath) {
+  function onChange(absPath: string) {
     if (shouldIgnore(absPath)) return
     const ext = path.extname(absPath).toLowerCase()
     if (!WATCH_EXTS.has(ext)) return
 
-    clearTimeout(debounce.get(absPath))
+    const pending = debounce.get(absPath)
+    if (pending) clearTimeout(pending)
     debounce.set(
       absPath,
       setTimeout(() => {
@@ -334,7 +335,7 @@ export async function startDev({ root, port, host }) {
     )
   }
 
-  function watchDir(dir) {
+  function watchDir(dir: string) {
     let watcher
     try {
       watcher = fs.watch(dir, { recursive: true }, (_event, filename) => {
@@ -360,8 +361,8 @@ export async function startDev({ root, port, host }) {
   startTscWatch(root)
   watchDir(root)
 
-  await new Promise((resolve) => {
-    server.listen(port, host, resolve)
+  await new Promise<void>((resolve) => {
+    server.listen(port, host, () => resolve())
   })
 
   console.log(`

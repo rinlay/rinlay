@@ -1,6 +1,6 @@
 {
   "name": "rinlay",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "description": "Vite-like dev server powered by tsc",
   "type": "module",
   "license": "MIT",
@@ -9,10 +9,17 @@
   },
   "files": [
     "bin",
-    "src"
+    "dist"
   ],
   "exports": {
-    ".": "./src/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run"
   },
   "publishConfig": {
     "access": "public"
@@ -24,5 +31,9 @@
     "typescript": {
       "optional": false
     }
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "vitest": "^5.0.1"
   }
 }

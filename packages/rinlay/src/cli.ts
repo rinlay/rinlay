@@ -1,7 +1,7 @@
 import { startDev } from './dev.js'
 import { build } from './build.js'
 
-export async function run(args) {
+export async function run(args: string[]) {
   const cmd = args[0]
   const root = process.cwd()
 

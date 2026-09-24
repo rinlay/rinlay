@@ -2,11 +2,13 @@ import fsp from 'node:fs/promises'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 
-export async function loadTsconfig(root) {
+export async function loadTsconfig(root: string) {
   const file = path.join(root, 'tsconfig.json')
   try {
     const raw = await fsp.readFile(file, 'utf8')
-    const json = JSON.parse(raw.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, ''))
+    const json = JSON.parse(raw.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '')) as {
+      compilerOptions?: { outDir?: string; rootDir?: string }
+    }
     const opts = json.compilerOptions || {}
     return {
       outDir: path.resolve(root, opts.outDir || '.rinlay'),
@@ -20,7 +22,7 @@ export async function loadTsconfig(root) {
   }
 }
 
-export function resolveTsc(root) {
+export function resolveTsc(root: string) {
   const require = createRequire(path.join(root, 'package.json'))
   try {
     return path.join(path.dirname(require.resolve('typescript/package.json')), 'bin', 'tsc')
@@ -31,7 +33,7 @@ export function resolveTsc(root) {
 }
 
 /** Absolute dir that holds react's index.js (usually .../dist) */
-export function resolveReactDir(root) {
+export function resolveReactDir(root: string) {
   const require = createRequire(path.join(root, 'package.json'))
   return path.dirname(require.resolve('react'))
 }
@@ -52,15 +54,15 @@ export function productionImportMap() {
  *   /src/main.tsx → ./main.js
  *   /src/index.css → ./index.css
  */
-export function rewriteHtmlForBuild(html) {
+export function rewriteHtmlForBuild(html: string) {
   let out = html
   out = out.replace(
     /\b(src|href)=(["'])\/?src\/([^"']+)\.tsx?\2/g,
-    (_, attr, q, file) => `${attr}=${q}./${file}.js${q}`,
+    (_, attr: string, q: string, file: string) => `${attr}=${q}./${file}.js${q}`,
   )
   out = out.replace(
     /\b(src|href)=(["'])\/?src\/([^"']+\.css)\2/g,
-    (_, attr, q, file) => `${attr}=${q}./${file}${q}`,
+    (_, attr: string, q: string, file: string) => `${attr}=${q}./${file}${q}`,
   )
   if (!out.includes('type="importmap"')) {
     const map = productionImportMap()
@@ -73,7 +75,7 @@ export function rewriteHtmlForBuild(html) {
   return out
 }
 
-export async function copyDirJs(srcDir, destDir) {
+export async function copyDirJs(srcDir: string, destDir: string) {
   await fsp.mkdir(destDir, { recursive: true })
   for (const name of await fsp.readdir(srcDir)) {
     if (!name.endsWith('.js') && !name.endsWith('.js.map')) continue
@@ -84,8 +86,8 @@ export async function copyDirJs(srcDir, destDir) {
   }
 }
 
-export async function copyCss(rootDir, outDir) {
-  async function walk(dir) {
+export async function copyCss(rootDir: string, outDir: string) {
+  async function walk(dir: string) {
     for (const name of await fsp.readdir(dir)) {
       const abs = path.join(dir, name)
       const st = await fsp.stat(abs)

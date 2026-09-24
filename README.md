@@ -30,7 +30,7 @@ pnpm workspace。
 
 ```
 rinlay
-├── packages/rinlay/          开发服务器与 build
+├── packages/rinlay/          开发服务器与 build，源码 TypeScript，产物 dist/
 ├── packages/rinlay-react/    运行时源码 → dist/
 ├── src/                      示例应用（TSX）
 ├── index.html                示例入口
@@ -90,6 +90,7 @@ rinlay
 ```bash
 pnpm install
 pnpm --filter rinlay-react build   # 运行时需要先有 dist/
+pnpm --filter rinlay build          # 命令行从 dist/ 启动
 pnpm dev                            # 示例应用
 pnpm build                          # 收到 .rinlay/
 ```

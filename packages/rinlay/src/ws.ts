@@ -1,10 +1,14 @@
 import crypto from 'node:crypto'
+import type { Server } from 'node:http'
+import type { Duplex } from 'node:stream'
 
 /**
  * Minimal WebSocket server (RFC 6455) — no external deps.
  */
 export class WebSocketServer {
-  constructor(server) {
+  clients = new Set<WebSocketClient>()
+
+  constructor(server: Server) {
     this.clients = new Set()
     server.on('upgrade', (req, socket, head) => {
       if ((req.headers.upgrade || '').toLowerCase() !== 'websocket') {
@@ -12,7 +16,7 @@ export class WebSocketServer {
         return
       }
       const key = req.headers['sec-websocket-key']
-      if (!key) {
+      if (!key || Array.isArray(key)) {
         socket.destroy()
         return
       }
@@ -39,22 +43,27 @@ export class WebSocketServer {
 }
 
 class WebSocketClient {
-  constructor(socket) {
+  socket: Duplex
+  readyState: number
+  _buffer: Buffer
+  _listeners: { close: Array<(data?: string) => void>; message: Array<(data?: string) => void> }
+
+  constructor(socket: Duplex) {
     this.socket = socket
     this.readyState = 1 // OPEN
     this._buffer = Buffer.alloc(0)
     this._listeners = { close: [], message: [] }
 
-    socket.on('data', (chunk) => this._feed(chunk))
+    socket.on('data', (chunk) => this._feed(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)))
     socket.on('close', () => this._close())
     socket.on('error', () => this._close())
   }
 
-  on(event, fn) {
+  on(event: 'close' | 'message', fn: (data?: string) => void) {
     ;(this._listeners[event] ||= []).push(fn)
   }
 
-  send(data) {
+  send(data: string) {
     if (this.readyState !== 1) return
     const payload = Buffer.from(String(data))
     const len = payload.length
@@ -75,7 +84,7 @@ class WebSocketClient {
     this.socket.write(Buffer.concat([header, payload]))
   }
 
-  _emit(event, ...args) {
+  _emit(event: 'close' | 'message', ...args: [string?]) {
     for (const fn of this._listeners[event] || []) fn(...args)
   }
 
@@ -90,7 +99,7 @@ class WebSocketClient {
     }
   }
 
-  _feed(chunk) {
+  _feed(chunk: Buffer) {
     this._buffer = Buffer.concat([this._buffer, chunk])
     while (this._buffer.length >= 2) {
       const first = this._buffer[0]

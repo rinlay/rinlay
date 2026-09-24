@@ -13,7 +13,7 @@ import {
  * so `.rinlay/` (or tsconfig outDir) is a static site.
  * Does not run tsc — emit is assumed to already be in outDir.
  */
-export async function build({ root }) {
+export async function build({ root }: { root: string }) {
   const indexHtml = path.join(root, 'index.html')
   try {
     await fsp.access(indexHtml)
@@ -24,14 +24,11 @@ export async function build({ root }) {
 
   const { outDir, rootDir } = await loadTsconfig(root)
 
-  // react runtime → outDir/react/
   const reactDir = resolveReactDir(root)
   await copyDirJs(reactDir, path.join(outDir, 'react'))
 
-  // styles from src → outDir
   await copyCss(rootDir, outDir)
 
-  // index.html template → outDir (paths rewritten for static serve)
   const html = await fsp.readFile(indexHtml, 'utf8')
   await fsp.writeFile(path.join(outDir, 'index.html'), rewriteHtmlForBuild(html))
 
