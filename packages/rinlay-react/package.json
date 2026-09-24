@@ -22,7 +22,9 @@
     }
   },
   "scripts": {
-    "build": "tsc -b",
-    "prepublishOnly": "tsc -b"
+    "build": "tsc -b"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
