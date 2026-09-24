@@ -1,6 +1,6 @@
 {
   "name": "rinlay-react",
-  "version": "0.1.2",
+  "version": "0.1.6",
   "description": "A minimal React-like runtime for rinlay",
   "type": "module",
   "license": "MIT",
