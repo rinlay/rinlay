@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node server.js",
-    "start": "serve dist",
+    "start": "serve .rinlay",
     "build": "tsc"
   },
   "dependencies": {
