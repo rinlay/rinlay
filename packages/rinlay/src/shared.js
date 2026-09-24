@@ -41,6 +41,8 @@ export function productionImportMap() {
     react: './react/index.js',
     'react/jsx-runtime': './react/jsx-runtime.js',
     'react/jsx-dev-runtime': './react/jsx-dev-runtime.js',
+    'react-dom': './react/react-dom.js',
+    'react-dom/client': './react/client.js',
   }
   return `<script type="importmap">\n${JSON.stringify({ imports }, null, 2)}\n</script>`
 }

@@ -86,13 +86,20 @@ function toPublicPath(root, absPath) {
 function buildImportMap(root) {
   const require = createRequire(path.join(root, 'package.json'))
   const imports = {}
+  let reactFile = ''
   for (const spec of ['react', 'react/jsx-runtime', 'react/jsx-dev-runtime']) {
     try {
       const resolved = require.resolve(spec)
       imports[spec] = toPublicPath(root, resolved)
+      if (spec === 'react') reactFile = resolved
     } catch {
       /* optional */
     }
+  }
+  if (reactFile) {
+    const dir = path.dirname(reactFile)
+    imports['react-dom'] = toPublicPath(root, path.join(dir, 'react-dom.js'))
+    imports['react-dom/client'] = toPublicPath(root, path.join(dir, 'client.js'))
   }
   if (!Object.keys(imports).length) return ''
   return `<script type="importmap">\n${JSON.stringify({ imports }, null, 2)}\n</script>`

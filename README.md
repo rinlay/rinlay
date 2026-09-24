@@ -40,19 +40,11 @@ rinlay
 
 ## 运行时
 
-`packages/rinlay-react` 提供和 JSX 转换对接的最小实现。
+`packages/rinlay-react` 是纯客户端的 React 与 React DOM。`react`、`react-dom`、`react-dom/client` 都指向这份运行时。
 
-导出：
+常用 API：`useState`、`useReducer`、`useEffect`、`useLayoutEffect`、`useRef`、`useMemo`、`useCallback`、`useContext`、`useId`、`useImperativeHandle`、`useSyncExternalStore`、`useTransition`、`useDeferredValue`、`use`、`memo`、`forwardRef`、`lazy`、`Suspense`、`createContext`、`createPortal`、`flushSync`。类型导出常用的 `FC`、`ReactNode`、`CSSProperties`、事件和常见标签属性。
 
-- `jsx` / `jsxs` / `Fragment`（`jsx-runtime`、`jsx-dev-runtime`）
-- `createElement`、`createRoot`
-- `useState`、`useEffect`
-
-挂载时，函数组件执行后直接生成 DOM。状态变化会重新执行组件，并用新节点替换旧节点，然后在微任务里刷新 effect。属性处理覆盖 `className`、对象形式的 `style`、`value`、`checked`，以及 `on*` 事件。
-
-这是白盒实现，源码在 `packages/rinlay-react/src/dom.ts`。它不做 fiber，也不做按 key 的列表复用。重渲染的代价是替换该组件的 DOM。复杂协调、并发、服务端渲染不在这个运行时里。
-
-类型上，`JSX.IntrinsicElements` 接受任意标签。`tsconfig` 使用 `jsx: react-jsx`，编译器把 JSX 转到 `react/jsx-runtime`。
+更新时按 type 和 key 复用节点，子组件状态会留下来。源码在 `packages/rinlay-react/src/`。没有合成事件、类组件、并发渲染和服务端 hydrate。`hydrateRoot` 会直接在容器里重绘。
 
 ## 开发服务器
 
@@ -63,7 +55,7 @@ rinlay
 1. 读取 `tsconfig.json` 的 `rootDir`（默认 `src`）和 `outDir`（默认 `.rinlay`）。
 2. 启动 `tsc -b -w`，由编译器监视并输出 JavaScript 与 source map。
 3. 用 Node `http` 提供项目文件。请求 `.ts` / `.tsx` 时，返回 `outDir` 里对应的 `.js`。`.js` 若在输出目录有同名文件，也返回编译结果。
-4. 向 HTML 注入 import map，把 `react`、`react/jsx-runtime`、`react/jsx-dev-runtime` 指到当前项目解析出来的运行时文件。
+4. 向 HTML 注入 import map，把 `react`、`react-dom`、`react-dom/client` 和 JSX runtime 指到当前项目解析出来的运行时文件。
 5. 注入一段无依赖的热更新客户端。CSS 变更只替换对应 `<link>`；HTML、JS、TS 变更整页刷新。WebSocket 握手在 `packages/rinlay/src/ws.js`，不引入第三方包。
 
 示例应用把依赖写成：
@@ -110,4 +102,4 @@ pnpm --filter website dev           # http://localhost:3000
 
 ## 边界
 
-运行时目前包含渲染、`useState`、`useEffect`。没有合成事件系统、context、refs 的完整语义，也没有打包、代码分割或框架路由。这些能力如果出现，应当仍然能在源码里直接读到，而不是藏进新的中间层。
+没有类组件、合成事件和并发特性。`lazy` / `Suspense` 在 promise 完成前显示 fallback，完成后重新挂载内容。这些行为都能在 `packages/rinlay-react/src/` 里直接读到。

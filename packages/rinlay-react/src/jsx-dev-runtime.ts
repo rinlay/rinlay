@@ -1,2 +1,3 @@
-export { jsx, jsxs, jsxDEV, Fragment } from './jsx-runtime.js'
-export type { VNode, Props, Child, FunctionComponent, JSX } from './jsx-runtime.js'
+export { jsx, jsxs, jsxDEV, Fragment } from './vnode.js'
+export type { VNode, Props } from './vnode.js'
+export type { ReactNode, JSX } from './types.js'
