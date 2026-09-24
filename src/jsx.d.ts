@@ -1,9 +1,9 @@
-import type { Props } from 'mini-react/jsx-runtime'
+import type { Props } from 'react/jsx-runtime'
 
 declare global {
   namespace JSX {
-    type Element = import('mini-react/jsx-runtime').VNode
-    type ElementType = string | import('mini-react/jsx-runtime').FunctionComponent
+    type Element = import('react/jsx-runtime').VNode
+    type ElementType = string | import('react/jsx-runtime').FunctionComponent
     interface IntrinsicElements {
       [tag: string]: Props
     }

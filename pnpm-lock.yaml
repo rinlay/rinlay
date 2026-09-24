@@ -8,7 +8,7 @@ importers:
 
   .:
     dependencies:
-      mini-react:
+      react:
         specifier: workspace:*
         version: link:packages/mini-react
     devDependencies:

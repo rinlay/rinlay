@@ -118,9 +118,9 @@ const IMPORT_MAP = /* html */ `
 <script type="importmap">
 {
   "imports": {
-    "mini-react": "/packages/mini-react/dist/index.js",
-    "mini-react/jsx-runtime": "/packages/mini-react/dist/jsx-runtime.js",
-    "mini-react/jsx-dev-runtime": "/packages/mini-react/dist/jsx-dev-runtime.js"
+    "react": "/packages/mini-react/dist/index.js",
+    "react/jsx-runtime": "/packages/mini-react/dist/jsx-runtime.js",
+    "react/jsx-dev-runtime": "/packages/mini-react/dist/jsx-dev-runtime.js"
   }
 }
 </script>
