@@ -1,17 +1,16 @@
 {
   "compilerOptions": {
+    "composite": true,
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "jsxImportSource": "mini-react",
     "strict": true,
     "rootDir": "src",
-    "outDir": ".rinlay",
+    "outDir": "dist",
+    "declaration": true,
     "sourceMap": true,
     "skipLibCheck": true,
     "lib": ["ESNext", "DOM"]
   },
-  "include": ["src/**/*"],
-  "references": [{ "path": "./packages/mini-react" }]
+  "include": ["src/**/*"]
 }

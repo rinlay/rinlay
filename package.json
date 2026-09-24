@@ -7,6 +7,9 @@
     "dev": "node server.js",
     "start": "node server.js"
   },
+  "dependencies": {
+    "mini-react": "workspace:*"
+  },
   "devDependencies": {
     "typescript": "^7.0.2"
   }

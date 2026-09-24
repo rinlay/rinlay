@@ -33,7 +33,7 @@ const MIME = {
 
 const TS_EXTS = new Set(['.ts', '.tsx'])
 const WATCH_EXTS = new Set(['.html', '.css', '.js', '.mjs', '.ts', '.tsx'])
-const IGNORE_DIRS = new Set(['.git', 'node_modules', '.DS_Store', '.rinlay'])
+const IGNORE_DIRS = new Set(['.git', 'node_modules', '.DS_Store', '.rinlay', 'dist'])
 
 const HMR_CLIENT = /* html */ `
 <script type="module">
@@ -118,10 +118,9 @@ const IMPORT_MAP = /* html */ `
 <script type="importmap">
 {
   "imports": {
-    "mini-react": "/src/mini-react/index.ts",
-    "mini-react/": "/src/mini-react/",
-    "mini-react/jsx-runtime": "/src/mini-react/jsx-runtime.ts",
-    "mini-react/jsx-dev-runtime": "/src/mini-react/jsx-dev-runtime.ts"
+    "mini-react": "/packages/mini-react/dist/index.js",
+    "mini-react/jsx-runtime": "/packages/mini-react/dist/jsx-runtime.js",
+    "mini-react/jsx-dev-runtime": "/packages/mini-react/dist/jsx-dev-runtime.js"
   }
 }
 </script>
@@ -156,7 +155,7 @@ function emitPathForJsUrl(absJsPath) {
 function startTscWatch() {
   const require = createRequire(import.meta.url)
   const tsc = path.join(path.dirname(require.resolve('typescript/package.json')), 'bin', 'tsc')
-  const child = spawn(process.execPath, [tsc, '-w', '--pretty', 'false', '--preserveWatchOutput'], {
+  const child = spawn(process.execPath, [tsc, '-b', '-w', '--pretty', 'false', '--preserveWatchOutput'], {
     cwd: ROOT,
     stdio: ['ignore', 'pipe', 'pipe'],
   })

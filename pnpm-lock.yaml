@@ -7,10 +7,16 @@ settings:
 importers:
 
   .:
+    dependencies:
+      mini-react:
+        specifier: workspace:*
+        version: link:packages/mini-react
     devDependencies:
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
+
+  packages/mini-react: {}
 
 packages:
 
