@@ -5,6 +5,7 @@ import path from 'node:path'
 import { spawn } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { WebSocketServer } from './ws.js'
+import { loadTsconfig, resolveTsc } from './shared.js'
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -26,7 +27,7 @@ const MIME = {
 
 const TS_EXTS = new Set(['.ts', '.tsx'])
 const WATCH_EXTS = new Set(['.html', '.css', '.js', '.mjs', '.ts', '.tsx'])
-const IGNORE_DIRS = new Set(['.git', 'node_modules', '.DS_Store', '.rinlay', 'dist'])
+const IGNORE_DIRS = new Set(['.git', 'node_modules', '.DS_Store'])
 
 const HMR_CLIENT = /* html */ `
 <script type="module">
@@ -78,29 +79,10 @@ const HMR_CLIENT = /* html */ `
 </script>
 `
 
-async function loadTsconfig(root) {
-  const file = path.join(root, 'tsconfig.json')
-  try {
-    const raw = await fsp.readFile(file, 'utf8')
-    const json = JSON.parse(raw.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, ''))
-    const opts = json.compilerOptions || {}
-    return {
-      outDir: path.resolve(root, opts.outDir || '.rinlay'),
-      rootDir: path.resolve(root, opts.rootDir || 'src'),
-    }
-  } catch {
-    return {
-      outDir: path.join(root, '.rinlay'),
-      rootDir: path.join(root, 'src'),
-    }
-  }
-}
-
 function toPublicPath(root, absPath) {
   return '/' + path.relative(root, absPath).split(path.sep).join('/')
 }
 
-/** Resolve bare deps (react / jsx-runtime) → project-relative URLs for importmap */
 function buildImportMap(root) {
   const require = createRequire(path.join(root, 'package.json'))
   const imports = {}
@@ -133,17 +115,6 @@ function injectHtml(html, importMap) {
     }
   }
   return out
-}
-
-function resolveTsc(root) {
-  const require = createRequire(path.join(root, 'package.json'))
-  try {
-    return path.join(path.dirname(require.resolve('typescript/package.json')), 'bin', 'tsc')
-  } catch {
-    // fall back to rinlay's resolution chain
-    const here = createRequire(import.meta.url)
-    return path.join(path.dirname(here.resolve('typescript/package.json')), 'bin', 'tsc')
-  }
 }
 
 function startTscWatch(root) {
@@ -211,6 +182,8 @@ export async function startDev({ root, port, host }) {
 
   const { outDir, rootDir } = await loadTsconfig(root)
   const importMap = buildImportMap(root)
+  const outDirName = path.basename(outDir)
+  const ignoreDirs = new Set([...IGNORE_DIRS, outDirName])
 
   function safeResolve(urlPath) {
     const decoded = decodeURIComponent(urlPath.split('?')[0])
@@ -321,8 +294,10 @@ export async function startDev({ root, port, host }) {
   function shouldIgnore(absPath) {
     const rel = path.relative(root, absPath)
     if (rel.startsWith('..')) return true
+    // ignore tsc emit dir (whatever outDir is)
+    if (absPath === outDir || absPath.startsWith(outDir + path.sep)) return true
     const parts = rel.split(path.sep)
-    return parts.some((p) => IGNORE_DIRS.has(p) || p.startsWith('.'))
+    return parts.some((p) => ignoreDirs.has(p) || p.startsWith('.'))
   }
 
   const debounce = new Map()

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "rinlay",
+    "build": "rinlay build",
     "start": "rinlay"
   },
   "dependencies": {
