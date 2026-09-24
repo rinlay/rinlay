@@ -12,7 +12,7 @@ export type VNode = {
 
 export type FunctionComponent = (props: Props) => Child
 
-export const Fragment = Symbol.for('dabao.fragment')
+export const Fragment = Symbol.for('rinlay.fragment')
 
 export function jsx(
   type: VNode['type'],

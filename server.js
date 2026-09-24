@@ -9,7 +9,7 @@ import { WebSocketServer } from './ws.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = __dirname
-const OUT = path.join(ROOT, '.dabao')
+const OUT = path.join(ROOT, '.rinlay')
 const PORT = Number(process.env.PORT) || 5173
 const HOST = process.env.HOST || '127.0.0.1'
 
@@ -33,7 +33,7 @@ const MIME = {
 
 const TS_EXTS = new Set(['.ts', '.tsx'])
 const WATCH_EXTS = new Set(['.html', '.css', '.js', '.mjs', '.ts', '.tsx'])
-const IGNORE_DIRS = new Set(['.git', 'node_modules', '.DS_Store', '.dabao'])
+const IGNORE_DIRS = new Set(['.git', 'node_modules', '.DS_Store', '.rinlay'])
 
 const HMR_CLIENT = /* html */ `
 <script type="module">
@@ -44,7 +44,7 @@ const HMR_CLIENT = /* html */ `
 
   function connect() {
     ws = new WebSocket(protocol + '//' + location.host)
-    ws.addEventListener('open', () => console.log('[dabao] connected'))
+    ws.addEventListener('open', () => console.log('[rinlay] connected'))
     ws.addEventListener('close', () => {
       clearTimeout(timer)
       timer = setTimeout(connect, 1000)
@@ -53,12 +53,12 @@ const HMR_CLIENT = /* html */ `
       let msg
       try { msg = JSON.parse(event.data) } catch { return }
       if (msg.type === 'reload') {
-        console.log('[dabao] full reload:', msg.path)
+        console.log('[rinlay] full reload:', msg.path)
         location.reload()
         return
       }
       if (msg.type === 'css' && msg.path) {
-        console.log('[dabao] css hot update:', msg.path)
+        console.log('[rinlay] css hot update:', msg.path)
         updateStylesheet(msg.path)
       }
     })
@@ -93,7 +93,7 @@ function safeResolve(urlPath) {
   return resolved
 }
 
-/** Map /src/foo.tsx → .dabao/foo.js */
+/** Map /src/foo.tsx → .rinlay/foo.js */
 function emitPathFor(absSource) {
   const rel = path.relative(path.join(ROOT, 'src'), absSource)
   if (rel.startsWith('..')) return null
@@ -136,7 +136,7 @@ function injectHmr(html) {
       out = IMPORT_MAP + out
     }
   }
-  if (!out.includes('[dabao] connected')) {
+  if (!out.includes('[rinlay] connected')) {
     if (/<\/body>/i.test(out)) {
       out = out.replace(/<\/body>/i, `${HMR_CLIENT}</body>`)
     } else {
@@ -146,7 +146,7 @@ function injectHmr(html) {
   return out
 }
 
-/** /src/foo.js → .dabao/foo.js when source was .ts/.tsx */
+/** /src/foo.js → .rinlay/foo.js when source was .ts/.tsx */
 function emitPathForJsUrl(absJsPath) {
   const rel = path.relative(path.join(ROOT, 'src'), absJsPath)
   if (rel.startsWith('..') || path.extname(rel) !== '.js') return null
@@ -205,7 +205,7 @@ const server = http.createServer(async (req, res) => {
       return
     }
 
-    // /src/App.js → .dabao/App.js (tsc relative imports)
+    // /src/App.js → .rinlay/App.js (tsc relative imports)
     if (ext === '.js') {
       const emitted = emitPathForJsUrl(filePath)
       if (emitted && (await waitForFile(emitted, 1000))) {
@@ -297,10 +297,10 @@ function onChange(absPath) {
         const delay = TS_EXTS.has(ext) ? 150 : 0
         setTimeout(() => {
           broadcast({ type: 'reload', path: publicPath })
-          console.log(`[dabao] change → ${publicPath}`)
+          console.log(`[rinlay] change → ${publicPath}`)
         }, delay)
       }
-      if (ext === '.css') console.log(`[dabao] change → ${publicPath}`)
+      if (ext === '.css') console.log(`[rinlay] change → ${publicPath}`)
     }, 50),
   )
 }
@@ -322,12 +322,12 @@ function watchDir(dir) {
       }).catch(() => {})
     })
   }
-  watcher.on('error', (err) => console.error('[dabao] watch error:', err.message))
+  watcher.on('error', (err) => console.error('[rinlay] watch error:', err.message))
 }
 
 startTscWatch()
 watchDir(ROOT)
 
 server.listen(PORT, HOST, () => {
-  console.log(`\n  dabao dev server (tsc)\n  ➜  http://${HOST}:${PORT}/\n`)
+  console.log(`\n  rinlay dev server (tsc)\n  ➜  http://${HOST}:${PORT}/\n`)
 })
