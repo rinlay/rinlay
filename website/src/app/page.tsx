@@ -4,8 +4,8 @@ export default function Home() {
   return (
     <div className="site">
       <header className="nav">
-        <a className="wordmark" href="#top">
-          rinlay
+        <a className="brand" href="#top" aria-label="rinlay">
+          <img src="/logo.png" alt="rinlay" />
         </a>
         <nav className="nav-links">
           <a href="#island">孤岛</a>
@@ -18,6 +18,9 @@ export default function Home() {
       <main id="top">
         <section className="hero">
           <div className="wrap">
+            <span className="hero-icon">
+              <img src="/icon.png" alt="" />
+            </span>
             <p className="kicker">自研 React 运行时</p>
             <h1>
               拒绝黑魔法。
@@ -149,7 +152,12 @@ export default function Home() {
       </main>
 
       <footer className="wrap footer">
-        <span>rinlay</span>
+        <span className="footer-brand">
+          <span className="footer-icon">
+            <img src="/icon.png" alt="" />
+          </span>
+          rinlay
+        </span>
         <span>架构写在仓库的 README</span>
       </footer>
     </div>
