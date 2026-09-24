@@ -13,12 +13,12 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "react": "npm:rinlay-react@workspace*"
+    "react": "npm:rinlay-react@workspace:*"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "rinlay": "workspace*",
+    "rinlay": "workspace:*",
     "serve": "^14.2.6",
     "typescript": "^7.0.2"
   }
