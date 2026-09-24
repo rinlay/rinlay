@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "mini-react",
+    "strict": true,
+    "paths": {
+      "*": ["./*"],
+      "mini-react": ["./src/mini-react/index.ts"],
+      "mini-react/*": ["./src/mini-react/*"]
+    },
+    "rootDir": "src",
+    "outDir": ".dabao",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "lib": ["ESNext", "DOM"]
+  },
+  "include": ["src/**/*"]
+}
