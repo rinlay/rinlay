@@ -12,6 +12,17 @@ export type VNode = {
 
 export type FunctionComponent = (props: Props) => Child
 
+export namespace JSX {
+  export type Element = VNode
+  export interface ElementChildrenAttribute {
+    children: {}
+  }
+  // mini-react accepts arbitrary DOM tags/props at runtime
+  export interface IntrinsicElements {
+    [elemName: string]: Props
+  }
+}
+
 export const Fragment = Symbol.for('rinlay.fragment')
 
 export function jsx(
