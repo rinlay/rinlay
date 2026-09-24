@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node server.js",
     "start": "serve dist",
-    "build": "node build.js"
+    "build": "tsc"
   },
   "dependencies": {
     "react": "workspace:*"
