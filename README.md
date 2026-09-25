@@ -1,6 +1,6 @@
 # rinlay
 
-AI-native frontend runtime. Self-hosted React plus a dev server — no bundling.
+AI-native dev server — React, no bundling.
 
 ```
 edit → compile → reload
