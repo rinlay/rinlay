@@ -12,10 +12,6 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package: [rinlay, rinlay-react]
     steps:
       - uses: actions/checkout@v4
 
@@ -32,11 +28,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Build
-        if: matrix.package == 'rinlay-react'
-        run: pnpm exec tsc -b packages/rinlay-react
+        run: pnpm exec tsc -b packages/rinlay
 
       - name: Publish
-        working-directory: packages/${{ matrix.package }}
+        working-directory: packages/rinlay
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |

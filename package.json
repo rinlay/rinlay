@@ -9,7 +9,7 @@
     "start": "rinlay"
   },
   "dependencies": {
-    "react": "workspace:rinlay-react@*"
+    "react": "npm:rinlay-react@0.1.8"
   },
   "devDependencies": {
     "rinlay": "workspace:*",

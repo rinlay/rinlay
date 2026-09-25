@@ -11,6 +11,5 @@
     "skipLibCheck": true,
     "lib": ["ESNext", "DOM"]
   },
-  "include": ["src/**/*"],
-  "references": [{ "path": "./packages/rinlay-react"}]
+  "include": ["src/**/*"]
 }

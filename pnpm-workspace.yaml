@@ -1,4 +1,5 @@
 packages:
   - "packages/*"
   - website
-  - "website-new"
+minimumReleaseAgeExclude:
+  - rinlay-react@0.1.8
