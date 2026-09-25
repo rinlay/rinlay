@@ -34,8 +34,8 @@ describe('rewriteHtmlForBuild', () => {
 </body>`)
     expect(html).toContain('href="./index.css"')
     expect(html).toContain('src="./main.js"')
-    expect(html).toContain('"react-dom": "./react/react-dom.js"')
-    expect(html).toContain('"react-dom/client": "./react/client.js"')
+    expect(html).toContain('"react": "https://unpkg.com/rinlay-react@0.1.8/dist/index.js"')
+    expect(html).toContain('"react-dom/client": "https://unpkg.com/rinlay-react@0.1.8/dist/client.js"')
   })
 
   it('keeps an import map that is already present', () => {
@@ -45,9 +45,9 @@ describe('rewriteHtmlForBuild', () => {
 })
 
 describe('productionImportMap', () => {
-  it('points react and react-dom at the copied runtime', () => {
+  it('points react and react-dom at the unpkg runtime', () => {
     const map = productionImportMap()
-    expect(map).toContain('./react/index.js')
-    expect(map).toContain('./react/client.js')
+    expect(map).toContain('https://unpkg.com/rinlay-react@0.1.8/dist/index.js')
+    expect(map).toContain('https://unpkg.com/rinlay-react@0.1.8/dist/client.js')
   })
 })

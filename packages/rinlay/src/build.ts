@@ -1,16 +1,11 @@
 import fsp from 'node:fs/promises'
 import path from 'node:path'
-import {
-  loadTsconfig,
-  resolveReactDir,
-  rewriteHtmlForBuild,
-  copyDirJs,
-  copyCss,
-} from './shared.js'
+import { loadTsconfig, rewriteHtmlForBuild, copyCss } from './shared.js'
 
 /**
- * Copy index.html (rewritten) + css + react into outDir
+ * Copy index.html (rewritten) + css into outDir
  * so `.rinlay/` (or tsconfig outDir) is a static site.
+ * React comes from the unpkg import map in the HTML.
  * Does not run tsc — emit is assumed to already be in outDir.
  */
 export async function build({ root }: { root: string }) {
@@ -23,9 +18,6 @@ export async function build({ root }: { root: string }) {
   }
 
   const { outDir, rootDir } = await loadTsconfig(root)
-
-  const reactDir = resolveReactDir(root)
-  await copyDirJs(reactDir, path.join(outDir, 'react'))
 
   await copyCss(rootDir, outDir)
 

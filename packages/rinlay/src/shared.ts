@@ -32,19 +32,16 @@ export function resolveTsc(root: string) {
   }
 }
 
-/** Absolute dir that holds react's index.js (usually .../dist) */
-export function resolveReactDir(root: string) {
-  const require = createRequire(path.join(root, 'package.json'))
-  return path.dirname(require.resolve('react'))
-}
+const REACT_CDN = 'https://unpkg.com/rinlay-react@0.1.8/dist'
 
+/** Import map that loads rinlay-react from unpkg. Dev and build both inject this. */
 export function productionImportMap() {
   const imports = {
-    react: './react/index.js',
-    'react/jsx-runtime': './react/jsx-runtime.js',
-    'react/jsx-dev-runtime': './react/jsx-dev-runtime.js',
-    'react-dom': './react/react-dom.js',
-    'react-dom/client': './react/client.js',
+    react: `${REACT_CDN}/index.js`,
+    'react/jsx-runtime': `${REACT_CDN}/jsx-runtime.js`,
+    'react/jsx-dev-runtime': `${REACT_CDN}/jsx-dev-runtime.js`,
+    'react-dom': `${REACT_CDN}/react-dom.js`,
+    'react-dom/client': `${REACT_CDN}/client.js`,
   }
   return `<script type="importmap">\n${JSON.stringify({ imports }, null, 2)}\n</script>`
 }
@@ -73,17 +70,6 @@ export function rewriteHtmlForBuild(html: string) {
     }
   }
   return out
-}
-
-export async function copyDirJs(srcDir: string, destDir: string) {
-  await fsp.mkdir(destDir, { recursive: true })
-  for (const name of await fsp.readdir(srcDir)) {
-    if (!name.endsWith('.js') && !name.endsWith('.js.map')) continue
-    const src = path.join(srcDir, name)
-    const st = await fsp.stat(src)
-    if (!st.isFile()) continue
-    await fsp.copyFile(src, path.join(destDir, name))
-  }
 }
 
 export async function copyCss(rootDir: string, outDir: string) {

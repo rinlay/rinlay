@@ -3,9 +3,8 @@ import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
-import { createRequire } from 'node:module'
 import { WebSocketServer } from './ws.js'
-import { loadTsconfig, resolveTsc } from './shared.js'
+import { loadTsconfig, productionImportMap, resolveTsc } from './shared.js'
 
 const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -81,28 +80,6 @@ const HMR_CLIENT = /* html */ `
 
 function toPublicPath(root: string, absPath: string) {
   return '/' + path.relative(root, absPath).split(path.sep).join('/')
-}
-
-function buildImportMap(root: string) {
-  const require = createRequire(path.join(root, 'package.json'))
-  const imports: Record<string, string> = {}
-  let reactFile = ''
-  for (const spec of ['react', 'react/jsx-runtime', 'react/jsx-dev-runtime']) {
-    try {
-      const resolved = require.resolve(spec)
-      imports[spec] = toPublicPath(root, resolved)
-      if (spec === 'react') reactFile = resolved
-    } catch {
-      /* optional */
-    }
-  }
-  if (reactFile) {
-    const dir = path.dirname(reactFile)
-    imports['react-dom'] = toPublicPath(root, path.join(dir, 'react-dom.js'))
-    imports['react-dom/client'] = toPublicPath(root, path.join(dir, 'client.js'))
-  }
-  if (!Object.keys(imports).length) return ''
-  return `<script type="importmap">\n${JSON.stringify({ imports }, null, 2)}\n</script>`
 }
 
 function injectHtml(html: string, importMap: string) {
@@ -188,7 +165,7 @@ export async function startDev({ root, port, host }: { root: string; port: numbe
   }
 
   const { outDir, rootDir } = await loadTsconfig(root)
-  const importMap = buildImportMap(root)
+  const importMap = productionImportMap()
   const outDirName = path.basename(outDir)
   const ignoreDirs = new Set([...IGNORE_DIRS, outDirName])
 

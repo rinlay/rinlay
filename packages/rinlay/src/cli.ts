@@ -24,7 +24,7 @@ export async function run(args: string[]) {
 Usage:
   rinlay        start dev server
   rinlay dev    start dev server
-  rinlay build  copy html/css/react into outDir
+  rinlay build  copy html/css into outDir
 `)
   process.exit(1)
 }
