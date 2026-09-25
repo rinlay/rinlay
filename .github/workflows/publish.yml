@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -25,12 +27,30 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: pnpm
 
+      - name: Read version
+        id: version
+        run: echo "version=$(node -p "require('./packages/rinlay/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Check if already published
+        id: check
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          if npm view "rinlay@${VERSION}" version >/dev/null 2>&1; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "rinlay@${VERSION} already published, skip"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - run: pnpm install --frozen-lockfile
+        if: steps.check.outputs.skip != 'true'
 
       - name: Build
+        if: steps.check.outputs.skip != 'true'
         run: pnpm exec tsc -b packages/rinlay packages/create-rinlay
 
       - name: Publish rinlay
+        if: steps.check.outputs.skip != 'true'
         working-directory: packages/rinlay
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -39,15 +59,10 @@ jobs:
             echo "::error::NPM_TOKEN secret is not set"
             exit 1
           fi
-          NAME=$(node -p "require('./package.json').name")
-          VERSION=$(node -p "require('./package.json').version")
-          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
-            echo "$NAME@$VERSION already published, skip"
-            exit 0
-          fi
           pnpm publish --access public --no-git-checks
 
       - name: Publish create-rinlay
+        if: steps.check.outputs.skip != 'true'
         working-directory: packages/create-rinlay
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -56,10 +71,51 @@ jobs:
             echo "::error::NPM_TOKEN secret is not set"
             exit 1
           fi
-          NAME=$(node -p "require('./package.json').name")
-          VERSION=$(node -p "require('./package.json').version")
-          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
-            echo "$NAME@$VERSION already published, skip"
-            exit 0
-          fi
           pnpm publish --access public --no-git-checks
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          TAG="v${VERSION}"
+
+          PREV=$(git describe --tags --abbrev=0 2>/dev/null || true)
+
+          {
+            echo "## Packages"
+            echo
+            echo "- \`rinlay@${VERSION}\` — [npm](https://www.npmjs.com/package/rinlay/v/${VERSION})"
+            echo "- \`create-rinlay@${VERSION}\` — [npm](https://www.npmjs.com/package/create-rinlay/v/${VERSION})"
+            echo
+            echo "## Install"
+            echo
+            echo '```bash'
+            echo "pnpm create rinlay my-app"
+            echo '```'
+            echo
+            echo "## Changes"
+            echo
+            if [ -n "$PREV" ]; then
+              git log "${PREV}..HEAD" --pretty=format:"- %s (%h)" --no-merges
+            else
+              git log --pretty=format:"- %s (%h)" --no-merges -20
+            fi
+          } > release-notes.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists locally, skip tagging"
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists, skip"
+          else
+            gh release create "$TAG" --title "v${VERSION}" --notes-file release-notes.md
+          fi
