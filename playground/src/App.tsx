@@ -10,8 +10,8 @@ let nextId = 1
 
 export default function App() {
   const [todos, setTodos] = useState<Todo[]>([
-    { id: nextId++, text: '写一个 rinlay-react', done: true },
-    { id: nextId++, text: '做一个 todo list', done: false },
+    { id: nextId++, text: 'Write a rinlay-react', done: true },
+    { id: nextId++, text: 'Build a todo list', done: false },
   ])
 
   const remaining = todos.filter((t) => !t.done).length
@@ -44,18 +44,18 @@ export default function App() {
     <div className="todo">
       <header className="todo-header">
         <h1>todos</h1>
-        <p>{remaining === 0 ? '全部搞定' : `还剩 ${remaining} 项`}</p>
+        <p>{remaining === 0 ? 'All done' : `${remaining} left`}</p>
       </header>
 
       <form className="todo-form" onSubmit={addTodo}>
         <input
           className="todo-input"
           name="todo"
-          placeholder="接下来做什么？"
+          placeholder="What needs to be done?"
           autocomplete="off"
         />
         <button className="todo-add" type="submit">
-          添加
+          Add
         </button>
       </form>
 
@@ -74,7 +74,7 @@ export default function App() {
               className="todo-remove"
               type="button"
               onClick={() => remove(todo.id)}
-              aria-label="删除"
+              aria-label="Remove"
             >
               ×
             </button>
@@ -84,7 +84,7 @@ export default function App() {
 
       {todos.some((t) => t.done) ? (
         <button className="todo-clear" type="button" onClick={clearDone}>
-          清除已完成
+          Clear completed
         </button>
       ) : null}
     </div>

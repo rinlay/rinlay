@@ -1,54 +1,54 @@
 # rinlay
 
-AI native 的前端运行时。自研 React 实现，加上一个不做打包的开发服务器。产物是 HTML、CSS、JavaScript。
+An AI-native frontend runtime. A self-hosted React implementation plus a dev server that does not bundle. Output is HTML, CSS, and JavaScript.
 
-指挥者下指令，AI 写代码，rinlay 负责把结果快速、确定地跑起来。
+A human gives instructions, an AI writes code, and rinlay runs the result quickly and predictably.
 
-## AI native 是什么
+## What AI native means
 
-AI 写前端，需要的不是花哨的热更新，而是一条**短、白盒、可预测**的闭环：
+When AI builds UI, it does not need fancy hot reload. It needs a **short, white-box, predictable** loop:
 
 ```
-改文件 → 编译成功或失败 → 看到结果或明确报错
+edit file → compile succeeds or fails → see the result or a clear error
 ```
 
-rinlay 为此设计：
+rinlay is built for that:
 
-- **语法是 JSX / React。** 模型训练数据里最多的 UI 写法，生成出来的组件不用翻译成另一套框架。
-- **运行时是白盒。** 自研 `rinlay-react`，`react` 这个名字指向它。没有 Webpack、Vite 中间层，控制台报错指向你写的源码。
-- **开发时不打包。** TypeScript 交给 `tsc`，服务器按文件把结果送出去。AI 读 `packages/rinlay/src/dev.ts` 就能理解整个流程。
-- **反馈是确定性的。** CSS 变更只换样式表；JS / TS 变更整页刷新。每次 reload 从干净状态开始，验证结论清晰，不会被残留的组件 state 误导。
-- **表面积极小。** `index.html` + `src/*.tsx` + `tsconfig.json`。没有配置文件迷宫，没有依赖图黑盒。
+- **Syntax is JSX / React.** The UI style models know best. Generated components do not need translation into another framework.
+- **The runtime is a white box.** Self-hosted `rinlay-react`; the name `react` points to it. No Webpack or Vite middle layer. Console errors point at your source files.
+- **No bundling in dev.** TypeScript goes through `tsc`; the server serves files as-is. An AI can read `packages/rinlay/src/dev.ts` and understand the full flow.
+- **Feedback is deterministic.** CSS changes swap the stylesheet; JS / TS changes trigger a full page reload. Every reload starts from a clean state, so verification is unambiguous and leftover component state cannot mislead you.
+- **Tiny surface area.** `index.html` + `src/*.tsx` + `tsconfig.json`. No config maze, no opaque dependency graph.
 
-热重载不是 AI 的刚需。整页刷新对 agent 来说，就是一次干净的「重新执行指令」。
+Hot reload is not an AI requirement. A full reload is, for an agent, a clean re-execution of the latest instruction.
 
-## 两种用法
+## Two modes
 
-**孤岛。** 宿主页面留一个插槽，加载 rinlay 的 CSS 和 JS，在该节点上 `createRoot`。旧系统的其余部分不进入这条编译链。
+**Island.** The host page leaves a slot, loads rinlay CSS and JS, and calls `createRoot` on that node. The rest of the legacy system stays out of this compile chain.
 
-**独立应用。** 一个 `index.html` 就是入口。同一个运行时，同一种挂法。
+**Standalone app.** One `index.html` is the entry. Same runtime, same mount pattern.
 
-## 仓库
+## Repository
 
-pnpm workspace。
+pnpm workspace.
 
-| 路径 | 职责 |
+| Path | Role |
 | --- | --- |
-| `packages/rinlay` | 命令行、开发服务器、静态构建 |
-| `packages/create-rinlay` | 脚手架，`pnpm create rinlay` |
-| [rinlay/react](https://github.com/rinlay/react) | JSX 运行时，发布为 `rinlay-react` |
-| `playground/` | Todo 示例，开发调试用 |
-| `example/` | 最小 Hello world 示例 |
+| `packages/rinlay` | CLI, dev server, static build |
+| `packages/create-rinlay` | Scaffolding via `pnpm create rinlay` |
+| [rinlay/react](https://github.com/rinlay/react) | JSX runtime, published as `rinlay-react` |
+| `playground/` | Todo sample for day-to-day development |
+| `example/` | Minimal hello-world sample |
 
 ```
 rinlay
-├── packages/rinlay/          开发服务器与 build
-├── packages/create-rinlay/   脚手架
-├── playground/               Todo 示例
-└── example/                  最小示例
+├── packages/rinlay/          dev server and build
+├── packages/create-rinlay/   scaffolding
+├── playground/               todo sample
+└── example/                  minimal sample
 ```
 
-## 新建项目
+## Create a project
 
 ```bash
 pnpm create rinlay my-app
@@ -57,56 +57,56 @@ pnpm install
 pnpm dev
 ```
 
-## 运行时
+## Runtime
 
-`rinlay-react` 是纯客户端的 React 与 React DOM。`react`、`react-dom`、`react-dom/client` 都指向这份运行时。
+`rinlay-react` is a client-only React and React DOM implementation. `react`, `react-dom`, and `react-dom/client` all resolve to it.
 
-常用 API：`useState`、`useReducer`、`useEffect`、`useLayoutEffect`、`useRef`、`useMemo`、`useCallback`、`useContext`、`useId`、`useImperativeHandle`、`useSyncExternalStore`、`useTransition`、`useDeferredValue`、`use`、`memo`、`forwardRef`、`lazy`、`Suspense`、`createContext`、`createPortal`、`flushSync`。
+Common APIs: `useState`, `useReducer`, `useEffect`, `useLayoutEffect`, `useRef`, `useMemo`, `useCallback`, `useContext`, `useId`, `useImperativeHandle`, `useSyncExternalStore`, `useTransition`, `useDeferredValue`, `use`, `memo`, `forwardRef`, `lazy`, `Suspense`, `createContext`, `createPortal`, `flushSync`.
 
-源码在 [rinlay/react](https://github.com/rinlay/react) 的 `src/`。没有合成事件、类组件、并发渲染。`hydrateRoot` 会直接在容器里重绘。
+Source lives in [rinlay/react](https://github.com/rinlay/react) under `src/`. No synthetic events, class components, or concurrent rendering. `hydrateRoot` re-renders directly into the container.
 
-## 开发服务器
+## Dev server
 
-`rinlay` 或 `rinlay dev` 启动，默认 `127.0.0.1:5173`。
+Run `rinlay` or `rinlay dev`. Default: `127.0.0.1:5173`.
 
-前提是项目根目录有 `index.html`。服务器会：
+Requires `index.html` at the project root. The server:
 
-1. 读取 `tsconfig.json` 的 `rootDir`（默认 `src`）和 `outDir`（默认 `.rinlay`）。
-2. 启动 `tsc -b -w`，由编译器监视并输出 JavaScript 与 source map。
-3. 用 Node `http` 提供项目文件。请求 `.ts` / `.tsx` 时，返回 `outDir` 里对应的 `.js`。
-4. 向 HTML 注入 import map，把 `react` 指到 unpkg 上的 `rinlay-react`。
-5. 注入热更新客户端。CSS 变更只替换对应 `<link>`；其余变更整页刷新。
+1. Reads `rootDir` (default `src`) and `outDir` (default `.rinlay`) from `tsconfig.json`.
+2. Starts `tsc -b -w` to watch and emit JavaScript plus source maps.
+3. Serves project files over Node `http`. Requests for `.ts` / `.tsx` return the matching `.js` from `outDir`.
+4. Injects an import map that points `react` at `rinlay-react` on unpkg.
+5. Injects a hot-update client. CSS changes replace the matching `<link>`; everything else triggers a full reload.
 
-业务代码照常 `import { useState } from 'react'`，运行的是自研运行时。
+Application code keeps using `import { useState } from 'react'` against the self-hosted runtime.
 
-## 构建
+## Build
 
-`rinlay build` 不调用 `tsc`。它假定 `outDir` 里已经有编译结果，然后把可部署的静态站点收拢到同一目录：
+`rinlay build` does not run `tsc`. It assumes emit already exists in `outDir`, then assembles a deployable static site in that directory:
 
-- 将 `rootDir` 下的 CSS 按相对路径拷到 `outDir`
-- 改写 `index.html`：`/src/main.tsx` 变为 `./main.js`，`/src/index.css` 变为 `./index.css`
-- 写入生产 import map
+- Copy CSS from `rootDir` into `outDir` preserving relative paths
+- Rewrite `index.html`: `/src/main.tsx` → `./main.js`, `/src/index.css` → `./index.css`
+- Write the production import map
 
-得到的目录可以单独托管，也可以嵌进任意宿主页面。
+The output can be hosted on its own or embedded in any host page.
 
-## 命令
+## Commands
 
-在仓库根目录：
+From the repo root:
 
 ```bash
 pnpm install
-pnpm --filter rinlay build          # 命令行从 dist/ 启动
-pnpm dev                            # playground（todo 示例）
-pnpm dev:example                    # example（最小示例）
+pnpm --filter rinlay build          # CLI runs from dist/
+pnpm dev                            # playground (todo sample)
+pnpm dev:example                    # example (minimal sample)
 ```
 
-在子目录：
+From a subdirectory:
 
 ```bash
 cd playground && pnpm dev
 cd example && pnpm dev
 ```
 
-## 边界
+## Limits
 
-没有类组件、合成事件和并发特性。`lazy` / `Suspense` 在 promise 完成前显示 fallback，完成后重新挂载内容。这些行为都能在 [rinlay/react](https://github.com/rinlay/react) 的 `src/` 里直接读到。
+No class components, synthetic events, or concurrent features. `lazy` / `Suspense` show a fallback until the promise resolves, then remount the content. All of this is readable directly in [rinlay/react](https://github.com/rinlay/react) under `src/`.
