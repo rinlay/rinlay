@@ -24,6 +24,7 @@ pnpm workspace。
 | 路径 | 职责 |
 | --- | --- |
 | `packages/rinlay` | 命令行、开发服务器、静态构建 |
+| `packages/create-rinlay` | 脚手架，`pnpm create rinlay` |
 | [rinlay/react](https://github.com/rinlay/react) | JSX 运行时，发布为 `rinlay-react` |
 | 仓库根目录 | 示例应用。`react` 依赖解析到 `rinlay-react` |
 | `website/` | 官网。Next.js 站点，不参与 rinlay 的运行时 |
@@ -80,6 +81,15 @@ rinlay
 孤岛。宿主页面留下插槽，加载 rinlay 的 CSS 和 JS，在该节点上 `createRoot`。旧系统的其余部分不进入这条编译链。
 
 独立应用。仓库根目录就是这种形态：`index.html` 指向 `/src/main.tsx` 和 `/src/index.css`，`pnpm dev` 等价于在根目录执行 `rinlay`。
+
+## 新建项目
+
+```bash
+pnpm create rinlay my-app
+cd my-app
+pnpm install
+pnpm dev
+```
 
 ## 命令
 

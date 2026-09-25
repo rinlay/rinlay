@@ -1,0 +1,16 @@
+{
+  "name": "{{name}}",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "rinlay",
+    "build": "rinlay build"
+  },
+  "dependencies": {
+    "react": "npm:rinlay-react@{{rinlayVersion}}"
+  },
+  "devDependencies": {
+    "rinlay": "^{{rinlayVersion}}",
+    "typescript": "^7.0.2"
+  }
+}

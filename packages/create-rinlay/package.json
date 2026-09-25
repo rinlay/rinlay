@@ -1,0 +1,26 @@
+{
+  "name": "create-rinlay",
+  "version": "0.1.10",
+  "description": "Scaffold a rinlay app",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "create-rinlay": "./bin/create-rinlay.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "template"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "vitest": "^5.0.1"
+  }
+}
