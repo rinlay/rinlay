@@ -92,12 +92,23 @@ type TemplateVars = {
   rinlayVersion: string
 }
 
+function templateDestName(name: string) {
+  if (!name.startsWith('_')) return name
+
+  const ext = path.extname(name)
+  let base = name.slice(1, ext ? -ext.length : undefined)
+  if (base.endsWith('_')) base = base.slice(0, -1)
+
+  const dest = `${base}${ext}`
+  return dest === 'gitignore' ? '.gitignore' : dest
+}
+
 async function copyTemplate(from: string, to: string, vars: TemplateVars) {
   await fsp.mkdir(to, { recursive: true })
   const entries = await fsp.readdir(from, { withFileTypes: true })
   for (const entry of entries) {
     const src = path.join(from, entry.name)
-    const dest = path.join(to, entry.name)
+    const dest = path.join(to, templateDestName(entry.name))
     if (entry.isDirectory()) {
       await copyTemplate(src, dest, vars)
       continue
