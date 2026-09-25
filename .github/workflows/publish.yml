@@ -35,22 +35,41 @@ jobs:
         id: check
         run: |
           VERSION=${{ steps.version.outputs.version }}
+          RINLAY_SKIP=false
+          CREATE_RINLAY_SKIP=false
+
           if npm view "rinlay@${VERSION}" version >/dev/null 2>&1; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
+            RINLAY_SKIP=true
             echo "rinlay@${VERSION} already published, skip"
           else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "rinlay@${VERSION} not published, will publish"
+          fi
+
+          if npm view "create-rinlay@${VERSION}" version >/dev/null 2>&1; then
+            CREATE_RINLAY_SKIP=true
+            echo "create-rinlay@${VERSION} already published, skip"
+          else
+            echo "create-rinlay@${VERSION} not published, will publish"
+          fi
+
+          echo "rinlay_skip=${RINLAY_SKIP}" >> "$GITHUB_OUTPUT"
+          echo "create_rinlay_skip=${CREATE_RINLAY_SKIP}" >> "$GITHUB_OUTPUT"
+
+          if [ "$RINLAY_SKIP" = "true" ] && [ "$CREATE_RINLAY_SKIP" = "true" ]; then
+            echo "needs_publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "needs_publish=true" >> "$GITHUB_OUTPUT"
           fi
 
       - run: pnpm install --frozen-lockfile
-        if: steps.check.outputs.skip != 'true'
+        if: steps.check.outputs.needs_publish == 'true'
 
       - name: Build
-        if: steps.check.outputs.skip != 'true'
+        if: steps.check.outputs.needs_publish == 'true'
         run: pnpm exec tsc -b packages/rinlay packages/create-rinlay
 
       - name: Publish rinlay
-        if: steps.check.outputs.skip != 'true'
+        if: steps.check.outputs.rinlay_skip != 'true'
         working-directory: packages/rinlay
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -62,7 +81,7 @@ jobs:
           pnpm publish --access public --no-git-checks
 
       - name: Publish create-rinlay
-        if: steps.check.outputs.skip != 'true'
+        if: steps.check.outputs.create_rinlay_skip != 'true'
         working-directory: packages/create-rinlay
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -74,7 +93,7 @@ jobs:
           pnpm publish --access public --no-git-checks
 
       - name: Create GitHub Release
-        if: steps.check.outputs.skip != 'true'
+        if: steps.check.outputs.needs_publish == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
