@@ -5,7 +5,6 @@ export default function App() {
 
   return (
     <main className="app">
-      <img className="logo" src="/logo.png" alt="rinlay" width="120" height="32" />
       <h1>Hello, world.</h1>
       <p className="lead">Edit <code>src/App.tsx</code> and save to reload.</p>
       <button className="btn" type="button" onClick={() => setCount((n) => n + 1)}>

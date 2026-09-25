@@ -30,13 +30,6 @@ body {
   padding: 3.5rem 1.25rem 4rem;
 }
 
-.logo {
-  display: block;
-  width: 7.5rem;
-  height: auto;
-  margin: 0 0 1rem;
-}
-
 h1 {
   margin: 0 0 0.75rem;
   font-size: clamp(2.25rem, 7vw, 3.25rem);
