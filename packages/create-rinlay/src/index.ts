@@ -93,14 +93,7 @@ type TemplateVars = {
 }
 
 function templateDestName(name: string) {
-  if (!name.startsWith('_')) return name
-
-  const ext = path.extname(name)
-  let base = name.slice(1, ext ? -ext.length : undefined)
-  if (base.endsWith('_')) base = base.slice(0, -1)
-
-  const dest = `${base}${ext}`
-  return dest === 'gitignore' ? '.gitignore' : dest
+  return name.endsWith('_') ? name.slice(0, -1) : name
 }
 
 async function copyTemplate(from: string, to: string, vars: TemplateVars) {
