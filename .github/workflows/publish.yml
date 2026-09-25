@@ -9,20 +9,19 @@ permissions:
   id-token: write
 
 jobs:
-  publish:
+  check:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      rinlay_skip: ${{ steps.check.outputs.rinlay_skip }}
+      create_rinlay_skip: ${{ steps.check.outputs.create_rinlay_skip }}
+      needs_publish: ${{ steps.check.outputs.needs_publish }}
     steps:
       - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org
-          cache: pnpm
 
       - name: Read version
         id: version
@@ -58,15 +57,29 @@ jobs:
             echo "needs_publish=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - run: pnpm install --frozen-lockfile
-        if: steps.check.outputs.needs_publish == 'true'
+  publish:
+    needs: check
+    if: needs.check.outputs.needs_publish == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Build
-        if: steps.check.outputs.needs_publish == 'true'
-        run: pnpm exec tsc -b packages/rinlay packages/create-rinlay
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm exec tsc -b packages/rinlay packages/create-rinlay
 
       - name: Publish rinlay
-        if: steps.check.outputs.rinlay_skip != 'true'
+        if: needs.check.outputs.rinlay_skip != 'true'
         working-directory: packages/rinlay
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -78,7 +91,7 @@ jobs:
           pnpm publish --access public --no-git-checks
 
       - name: Publish create-rinlay
-        if: steps.check.outputs.create_rinlay_skip != 'true'
+        if: needs.check.outputs.create_rinlay_skip != 'true'
         working-directory: packages/create-rinlay
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
