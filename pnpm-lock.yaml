@@ -8,19 +8,6 @@ importers:
 
   .: {}
 
-  example:
-    dependencies:
-      react:
-        specifier: npm:rinlay-react@0.1.10
-        version: rinlay-react@0.1.10
-    devDependencies:
-      rinlay:
-        specifier: workspace:*
-        version: link:../packages/rinlay
-      typescript:
-        specifier: ^7.0.2
-        version: 7.0.2
-
   packages/create-rinlay:
     devDependencies:
       '@types/node':
