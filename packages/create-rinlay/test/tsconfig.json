@@ -3,13 +3,11 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "jsx": "react-jsx",
     "strict": true,
-    "rootDir": "src",
-    "outDir": ".rinlay",
-    "sourceMap": true,
+    "noEmit": true,
     "skipLibCheck": true,
-    "lib": ["ESNext", "DOM"]
+    "lib": ["ESNext"],
+    "types": ["node"]
   },
-  "include": ["src/**/*"]
+  "include": ["./**/*", "../src/**/*"]
 }
