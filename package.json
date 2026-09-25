@@ -1,18 +1,11 @@
 {
-  "name": "rinlay-playground",
-  "version": "0.0.0",
+  "name": "rinlay-monorepo",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "rinlay",
-    "build": "rinlay build",
-    "start": "rinlay"
-  },
-  "dependencies": {
-    "react": "npm:rinlay-react@0.1.8"
-  },
-  "devDependencies": {
-    "rinlay": "workspace:*",
-    "typescript": "^7.0.2"
+    "dev": "pnpm --filter playground dev",
+    "dev:example": "pnpm --filter example dev",
+    "build": "pnpm --filter rinlay build && pnpm --filter create-rinlay build",
+    "test": "pnpm --filter rinlay test && pnpm --filter create-rinlay test"
   }
 }

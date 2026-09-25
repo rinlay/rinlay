@@ -1,0 +1,16 @@
+{
+  "name": "example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "rinlay",
+    "build": "rinlay build"
+  },
+  "dependencies": {
+    "react": "npm:rinlay-react@0.1.10"
+  },
+  "devDependencies": {
+    "rinlay": "workspace:*",
+    "typescript": "^7.0.2"
+  }
+}

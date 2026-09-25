@@ -6,15 +6,17 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  example:
     dependencies:
       react:
-        specifier: npm:rinlay-react@0.1.8
-        version: rinlay-react@0.1.8
+        specifier: npm:rinlay-react@0.1.10
+        version: rinlay-react@0.1.10
     devDependencies:
       rinlay:
         specifier: workspace:*
-        version: link:packages/rinlay
+        version: link:../packages/rinlay
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
@@ -40,6 +42,19 @@ importers:
       vitest:
         specifier: ^5.0.1
         version: 5.0.1(@types/node@26.6.2)(happy-dom@20.14.5)(vite@8.3.0(@types/node@26.6.2)(jiti@2.7.0))
+
+  playground:
+    dependencies:
+      react:
+        specifier: npm:rinlay-react@0.1.10
+        version: rinlay-react@0.1.10
+    devDependencies:
+      rinlay:
+        specifier: workspace:*
+        version: link:../packages/rinlay
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
 
 packages:
 
@@ -456,8 +471,8 @@ packages:
     resolution: {integrity: sha512-RRuzqDtt5Y9h3quz5hWhK+TPnsmVs6WwSU6LkJMeY4HstUEDuYTG8UJSdawMRzmzAtV+KEoG8N3Qg2qLy5vM/A==}
     engines: {node: ^10 || ^12 || >=14}
 
-  rinlay-react@0.1.8:
-    resolution: {integrity: sha512-4rjY+nz2K+tQly2W26Ny+TaoGeF9QzQKSOyI6ACWX3HmvNK4WOTOgZS9Hejp1RJ92nncln4XYUnTrr+wZ76lyQ==}
+  rinlay-react@0.1.10:
+    resolution: {integrity: sha512-lTcXywzzpudDKwrZACQthWq9Yoj3OSOKT58ddDU+V4O9nTQ7954SkwWgqJBVMfOSh+83VVvQvFU0V2WnjnG9hw==}
 
   rolldown@1.2.10:
     resolution: {integrity: sha512-OxkA08pSryMK7B3XiFA09B4OJ1xJMPgIYCBMY2xchzpqgBGsV1o0DetPAE+Sl3N3L4oCPiEzmHVSOj7iR04Zog==}
@@ -867,7 +882,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  rinlay-react@0.1.8: {}
+  rinlay-react@0.1.10: {}
 
   rolldown@1.2.10:
     dependencies:

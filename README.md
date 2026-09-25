@@ -37,15 +37,15 @@ pnpm workspace。
 | `packages/rinlay` | 命令行、开发服务器、静态构建 |
 | `packages/create-rinlay` | 脚手架，`pnpm create rinlay` |
 | [rinlay/react](https://github.com/rinlay/react) | JSX 运行时，发布为 `rinlay-react` |
-| 仓库根目录 | 示例应用 |
+| `playground/` | Todo 示例，开发调试用 |
+| `example/` | 最小 Hello world 示例 |
 
 ```
 rinlay
 ├── packages/rinlay/          开发服务器与 build
 ├── packages/create-rinlay/   脚手架
-├── src/                      示例应用（TSX）
-├── index.html                示例入口
-└── tsconfig.json             rootDir=src，outDir=.rinlay
+├── playground/               Todo 示例
+└── example/                  最小示例
 ```
 
 ## 新建项目
@@ -96,8 +96,15 @@ pnpm dev
 ```bash
 pnpm install
 pnpm --filter rinlay build          # 命令行从 dist/ 启动
-pnpm dev                            # 示例应用
-pnpm build                          # 输出到 .rinlay/
+pnpm dev                            # playground（todo 示例）
+pnpm dev:example                    # example（最小示例）
+```
+
+在子目录：
+
+```bash
+cd playground && pnpm dev
+cd example && pnpm dev
 ```
 
 ## 边界

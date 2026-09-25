@@ -1,4 +1,6 @@
 packages:
   - "packages/*"
+  - playground
+  - example
 minimumReleaseAgeExclude:
-  - rinlay-react@0.1.8
+  - rinlay-react@0.1.8 || 0.1.10
