@@ -6,7 +6,6 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
   id-token: write
 
 jobs:
@@ -14,8 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -91,50 +88,3 @@ jobs:
             exit 1
           fi
           pnpm publish --access public --no-git-checks
-
-      - name: Create GitHub Release
-        if: steps.check.outputs.needs_publish == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ steps.version.outputs.version }}
-        run: |
-          TAG="v${VERSION}"
-
-          PREV=$(git describe --tags --abbrev=0 2>/dev/null || true)
-
-          {
-            echo "## Packages"
-            echo
-            echo "- \`rinlay@${VERSION}\` — [npm](https://www.npmjs.com/package/rinlay/v/${VERSION})"
-            echo "- \`create-rinlay@${VERSION}\` — [npm](https://www.npmjs.com/package/create-rinlay/v/${VERSION})"
-            echo
-            echo "## Install"
-            echo
-            echo '```bash'
-            echo "pnpm create rinlay my-app"
-            echo '```'
-            echo
-            echo "## Changes"
-            echo
-            if [ -n "$PREV" ]; then
-              git log "${PREV}..HEAD" --pretty=format:"- %s (%h)" --no-merges
-            else
-              git log --pretty=format:"- %s (%h)" --no-merges -20
-            fi
-          } > release-notes.md
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists locally, skip tagging"
-          else
-            git tag "$TAG"
-            git push origin "$TAG"
-          fi
-
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "Release $TAG already exists, skip"
-          else
-            gh release create "$TAG" --title "v${VERSION}" --notes-file release-notes.md
-          fi
